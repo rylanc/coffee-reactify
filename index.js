@@ -1,12 +1,22 @@
-var coffee = require('coffee-script');
+var util = require('util');
 var through = require('through');
 var convert = require('convert-source-map');
+var coffee = require('coffee-script');
+var csxtransform = require('coffee-react-transform');
 
-function isCoffee (file) {
+function hasCSXExtension (file) {
+    return (/\.csx$/).test(file);
+}
+
+function hasCSXPragma (src) {
+    return (/^\s*#\s*@csx/).test(src);
+}
+
+function hasCoffeeExtension (file) {
     return (/\.((lit)?coffee|coffee\.md)$/).test(file);
 }
 
-function isLiterate (file) {
+function hasLiterateExtension (file) {
     return (/\.(litcoffee|coffee\.md)$/).test(file);
 }
 
@@ -50,7 +60,7 @@ function compile(file, data, callback) {
             generatedFile: file,
             inline: true,
             bare: true,
-            literate: isLiterate(file)
+            literate: hasLiterateExtension(file)
         });
     } catch (e) {
         var error = e;
@@ -67,8 +77,15 @@ function compile(file, data, callback) {
     callback(null, compiled.js + '\n' + map.toComment() + '\n');
 }
 
-function coffeeify(file) {
-    if (!isCoffee(file)) return through();
+function coffeereactify(file, opts) {
+    opts = opts || {};
+    var passthroughCoffee = opts['coffeeout'] || false;
+    var hasCoffeeExt = hasCoffeeExtension(file);
+    var hasCSXExt = hasCSXExtension(file);
+
+    if (!(hasCoffeeExt || hasCSXExt)) {
+        return through();
+    }
 
     var data = '', stream = through(write, end);
 
@@ -79,7 +96,28 @@ function coffeeify(file) {
     }
 
     function end() {
-        compile(file, data, function(error, result) {
+        var transformed;
+        var isCSX = hasCSXExt || hasCSXPragma(data);
+
+        if (isCSX) {
+            try {
+                transformed = csxtransform(data);
+            } catch (error) {
+                if (error) stream.emit('error', error);
+            }
+        }
+
+        var coffeeToCompile = isCSX ? transformed : data;
+
+        if (hasCoffeeExt && passthroughCoffee) {
+            // passthrough un-compiled coffeescript
+            stream.queue(coffeeToCompile);
+            stream.queue(null);
+            return; // bail out before compile
+        }
+
+        // otherwise compile either transformed csx or pure coffee
+        compile(file, coffeeToCompile, function(error, result) {
             if (error) stream.emit('error', error);
             stream.queue(result);
             stream.queue(null);
@@ -87,8 +125,10 @@ function coffeeify(file) {
     }
 }
 
-coffeeify.compile = compile;
-coffeeify.isCoffee = isCoffee;
-coffeeify.isLiterate = isLiterate;
+coffeereactify.compile = compile;
+coffeereactify.isCoffee = hasCoffeeExtension;
+coffeereactify.isLiterate = hasLiterateExtension;
+coffeereactify.hasCSXExtension = hasCSXExtension;
+coffeereactify.hasCSXPragma = hasCSXPragma;
 
-module.exports = coffeeify;
+module.exports = coffeereactify;

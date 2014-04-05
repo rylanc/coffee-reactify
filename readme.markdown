@@ -1,65 +1,72 @@
-# coffeeify
+# coffee-reactify
 
-browserify v2 plugin for coffee-script
+browserify v2 plugin for applying [coffee-react-transform](https://github.com/jsdf/coffee-react-transform)
 
-mix and match `.coffee` and `.js` files in the same project
-
-[![Build Status](https://travis-ci.org/jnordberg/coffeeify.png?branch=master)](https://travis-ci.org/jnordberg/coffeeify)
+mix and match `.csx` and `.coffee` files in the same project
 
 # example
 
-given some files written in a mix of `js` and `coffee`:
+given some files written in a mix of `coffee` and `csx`:
 
-foo.coffee:
+neat-ui.coffee:
+``` coffee
+require './rad-component.csx'
+
+React.renderComponent RadComponent({rad:"mos def"}), document.getElementById('container')
+```
+
+rad-component.csx:
+``` coffee
+# @csx React.DOM 
+
+React = require('react')
+
+RadComponent = React.createClass
+  render: ->
+    <div className="rad-component">
+      <p>is this component rad? {@props.rad}</p>
+    </div>
+```
+
+install coffee-reactify:
+
+```bash
+$ npm install coffee-reactify
+```
+
+when you compile your app, pass `-t coffee-reactify` to browserify:
+
+```bash
+$ browserify -t coffee-reactify neat-ui.coffee > bundle.js
+```
+
+you can omit the `.csx` extension from your requires if you add the extension to browserify's module extensions:
 
 ``` coffee
-console.log(require './bar.js')
+require './component'
+...
 ```
 
-bar.js:
-
-``` js
-module.exports = require('./baz.coffee')(5)
+```bash
+$ browserify -t coffee-reactify --extension=".csx" neat-ui.coffee > bundle.js
 ```
 
-baz.coffee:
+providing the transform option `coffeeout: true` will passthrough the transformed
+output of `.coffee` files with the `# @csx` pragma without compiling them to javascript.
+this means you can use a different coffee compiler transform such as [icsify](https://github.com/maxtaco/icsify) or [coffeeify](https://github.com/jnordberg/coffeeify) in conjunction with this transform.
+**note:** at this stage, `.csx` files will still be compiled even with `--coffeeout`,
+as other transform modules like coffeeify will skip them due to the file extension.
 
-``` js
-module.exports = (n) -> n * 111
-```
-
-install coffeeify into your app:
-
-```
-$ npm install coffeeify
-```
-
-when you compile your app, just pass `-t coffeeify` to browserify:
-
-```
-$ browserify -t coffeeify foo.coffee > bundle.js
-$ node bundle.js
-555
-```
-
-you can omit the `.coffee` extension from your requires if you add the extension to browserify's module extensions:
-
-``` js
-module.exports = require('./baz')(5)
-```
-
-```
-$ browserify -t coffeeify --extension=".coffee" foo.coffee > bundle.js
-$ node bundle.js
-555
+```bash
+$ browserify -t [ coffee-reactify --coffeeout ] -t coffeeify neat-ui.coffee > bundle.js
 ```
 
 # install
 
 With [npm](https://npmjs.org) do:
 
-```
-npm install coffeeify
+```bash
+npm install coffee-reactify
 ```
 
 # license
