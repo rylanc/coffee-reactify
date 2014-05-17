@@ -7,7 +7,7 @@ function bundle (file, opts) {
     test('bundle transform', function (t) {
         t.plan(1);
 
-        var b = browserify({extensions: ['.coffee', '.csx']});
+        var b = browserify({extensions: ['.coffee', '.cjsx']});
         b.add(__dirname + file);
         b.transform((opts||{}),__dirname + '/..');
         b.bundle(function (err, src) {
