@@ -1,6 +1,8 @@
 # react mock for tests
 
-elements = require 'coffee-react-transform/lib/htmlelements'
+elements =
+	div: true
+	p: true
 
 makeEl = (name) ->
 	(children) -> type: name, children: children
