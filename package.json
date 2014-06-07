@@ -1,6 +1,6 @@
 {
   "name": "coffee-reactify",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "browserify v2 plugin for coffee-react csx",
   "main": "index.js",
   "dependencies": {
