@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+git pull origin master
 VERSION=`npm view coffee-react version`
 npm install --save "coffee-react@${VERSION}"
 npm test
