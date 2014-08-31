@@ -1,11 +1,18 @@
 #!/bin/bash
 set -e
 git pull origin master
-VERSION=`npm view coffee-react version`
-npm install --save "coffee-react@${VERSION}"
+DEPENDENCY="coffee-react"
+VERSION=`npm view ${DEPENDENCY} version`
+echo "updating to $VERSION"
+npm install --save "${DEPENDENCY}@${VERSION}"
 npm test
 git add ./package.json
-git commit -m "updated coffee-react to v${VERSION}"
+git commit -m "updated ${DEPENDENCY} to v${VERSION}"
 npm version $VERSION
-git push origin master
-npm publish .
+read -p "will publish $VERSION. are you sure? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  git push origin master
+  npm publish .
+fi
