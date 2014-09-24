@@ -90,12 +90,10 @@ function coffeereactify(file, opts) {
         if (hasCoffeeExt && passthroughCoffee) {
             // passthrough un-compiled coffeescript
             var transformed;
-            if (coffeereact.hasCJSXPragma(data)) {
-                try {
-                    transformed = coffeereact.transform(data);
-                } catch (error) {
-                    return stream.emit('error', error);
-                }
+            try {
+                transformed = coffeereact.transform(data);
+            } catch (error) {
+                return stream.emit('error', error);
             }
             stream.queue(transformed || data);
             stream.queue(null);
