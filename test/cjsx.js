@@ -18,12 +18,7 @@ function bundle (file, opts) {
         });
 
         function log (msg) {
-            var expected = {
-                type: 'div',
-                children: {
-                    className: 'rad-component'
-                }
-            };
+            var expected = "<div class=\"rad-component\"><p>is this component rad? mos def</p></div>";
 
             t.equal(JSON.stringify(msg), JSON.stringify(expected));
         }

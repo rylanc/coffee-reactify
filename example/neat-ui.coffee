@@ -1,7 +1,5 @@
-React = require './react'
-document = require './dom'
+React = require 'react'
 
 RadComponent = require './rad-component'
 
-React.renderComponent RadComponent(rad: 'mos def'),
-	document.getElementById 'container'
+console.log React.renderComponentToStaticMarkup React.createElement(RadComponent, rad: 'mos def')

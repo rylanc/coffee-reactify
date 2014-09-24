@@ -1,6 +1,6 @@
 # @cjsx React.DOM 
 
-React = require './react'
+React = require 'react'
 
 RadComponent = React.createClass
   render: ->
