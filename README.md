@@ -1,8 +1,6 @@
 # coffee-reactify
 
-browserify v2 plugin for applying [coffee-react-transform](https://github.com/jsdf/coffee-react-transform)
-
-mix and match `.cjsx` and `.coffee` files in the same project
+browserify v2 plugin for compiling [coffee-react-transform](https://github.com/jsdf/coffee-react-transform) CJSX markup in Coffeescript.
 
 # example
 
@@ -32,8 +30,15 @@ RadComponent = React.createClass
 install coffee-reactify:
 
 ```bash
-$ npm install coffee-reactify
+$ npm install -g coffee-react
 ```
+
+version compatibility: 
+
+- 2.1.x - React 0.12.1
+- 2.x - React 0.12
+- 1.x - React 0.11.2
+- 0.x - React 0.11 and below
 
 when you compile your app, pass `-t coffee-reactify` to browserify:
 
@@ -41,7 +46,7 @@ when you compile your app, pass `-t coffee-reactify` to browserify:
 $ browserify -t coffee-reactify neat-ui.coffee > bundle.js
 ```
 
-you can omit the `.cjsx` extension from your requires if you add the extension to browserify's module extensions:
+you can omit the `.coffee` or `.cjsx` extension from your requires if you add the extension to browserify's module extensions:
 
 ``` coffee
 require './component'
@@ -49,7 +54,7 @@ require './component'
 ```
 
 ```bash
-$ browserify -t coffee-reactify --extension=".cjsx" neat-ui.coffee > bundle.js
+$ browserify -t coffee-reactify --extension=".cjsx" --extension=".coffee" neat-ui.coffee > bundle.js
 ```
 
 providing the transform option `coffeeout: true` will passthrough the transformed
