@@ -43,11 +43,11 @@ ParseError.prototype.inspect = function () {
     return this.annotated;
 };
 
-function compile(file, data, callback) {
+function compile(file, data, sourceMap, callback) {
     var compiled;
     try {
         compiled = coffeereact.compile(data, {
-            sourceMap: true,
+            sourceMap: sourceMap,
             generatedFile: file,
             inline: true,
             bare: true,
@@ -62,15 +62,21 @@ function compile(file, data, callback) {
         return;
     }
 
-    var map = convert.fromJSON(compiled.v3SourceMap);
-    map.setProperty('sources', [file]);
+    if (sourceMap) {
+        var map = convert.fromJSON(compiled.v3SourceMap);
+        map.setProperty('sources', [file]);
 
-    callback(null, compiled.js + '\n' + map.toComment() + '\n');
+        callback(null, compiled.js + '\n' + map.toComment() + '\n');
+    }
+    else {
+        callback(null, compiled);
+    }
 }
 
 function coffeereactify(file, opts) {
     opts = opts || {};
     var passthroughCoffee = opts['coffeeout'] || false;
+    var sourceMap = !opts['disable-sourcemaps'];
     var hasCoffeeExt = hasCoffeeExtension(file);
     var hasCJSXExt = coffeereact.hasCJSXExtension(file);
 
@@ -99,7 +105,7 @@ function coffeereactify(file, opts) {
             stream.queue(null);
         } else {
             // otherwise compile either cjsx or pure coffee
-            compile(file, data, function(error, result) {
+            compile(file, data, sourceMap, function(error, result) {
                 if (error) stream.emit('error', error);
                 stream.queue(result);
                 stream.queue(null);
